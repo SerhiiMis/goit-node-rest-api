@@ -6,7 +6,7 @@ import {
   updateContact,
 } from "../services/contactsServices.js";
 
-export const getAllContacts = async (req, res, nest) => {
+export const getAllContacts = async (req, res, next) => {
   try {
     const contacts = await listContacts();
     res.status(200).json(contacts);
