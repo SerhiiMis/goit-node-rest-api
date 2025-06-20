@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+import Contact from "../models/contact.js";
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ export const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ Database connection successful");
+
+    await sequelize.sync();
+    console.log("✅ Models synchronized with the database");
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);
     process.exit(1);
