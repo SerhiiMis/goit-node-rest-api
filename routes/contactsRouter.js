@@ -5,6 +5,7 @@ import {
   deleteContact,
   createContact,
   updateContactById,
+  updateStatusContact,
 } from "../controllers/contactsControllers.js";
 import validateBody from "../helpers/validateBody.js";
 import {
@@ -32,19 +33,7 @@ contactsRouter.put(
 contactsRouter.patch(
   "/:id/favorite",
   validateBody(updateFavoriteSchema),
-  async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const { favorite } = req.body;
-      const updated = await updateStatusContact(id, favorite);
-      if (!updated) {
-        return res.status(404).json({ message: "Not found" });
-      }
-      res.status(200).json(updated);
-    } catch (error) {
-      next(error);
-    }
-  }
+  updateStatusContact
 );
 
 export default contactsRouter;
