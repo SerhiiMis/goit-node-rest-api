@@ -4,12 +4,6 @@ import { sequelize } from "../db/index.js";
 const Contact = sequelize.define(
   "contact",
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
