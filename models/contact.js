@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../db/index.js";
+import { sequelize } from "../db/sequelize.js";
 import User from "./user.js";
 
 const Contact = sequelize.define(
@@ -18,9 +18,7 @@ const Contact = sequelize.define(
       },
     },
   },
-  {
-    timestamps: false,
-  }
+  { timestamps: false }
 );
 
 User.hasMany(Contact, { foreignKey: "owner" });
