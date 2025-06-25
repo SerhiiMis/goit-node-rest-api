@@ -20,6 +20,8 @@ export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
 
 export const connectToDatabase = async () => {
   try {
+    await import("../models/initModels.js");
+
     await sequelize.authenticate();
     console.log("✅ Database connection successful");
 
