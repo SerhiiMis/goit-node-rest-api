@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/index.js";
+import User from "./user.js";
 
 const Contact = sequelize.define(
   "contact",
@@ -19,6 +20,14 @@ const Contact = sequelize.define(
     favorite: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    owner: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
   },
   {
