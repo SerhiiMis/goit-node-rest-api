@@ -2,14 +2,13 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
-import { connectToDatabase, sequelize } from "./db/index.js";
+import { connectToDatabase } from "./db/index.js";
 import Contact from "./models/contact.js";
 import contactsRouter from "./routes/contactsRouter.js";
 
 const startServer = async () => {
   await connectToDatabase();
 
-  await sequelize.sync();
   console.log("✅ Models synchronized with the database");
 
   const app = express();
