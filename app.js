@@ -5,6 +5,7 @@ import cors from "cors";
 import { connectToDatabase } from "./db/index.js";
 import Contact from "./models/contact.js";
 import contactsRouter from "./routes/contactsRouter.js";
+import authRouter from "./routes/authRouter.js";
 
 const startServer = async () => {
   await connectToDatabase();
@@ -18,6 +19,7 @@ const startServer = async () => {
   app.use(express.json());
 
   app.use("/api/contacts", contactsRouter);
+  app.use("/api/auth", authRouter);
 
   app.use((_, res) => {
     res.status(404).json({ message: "Route not found" });
