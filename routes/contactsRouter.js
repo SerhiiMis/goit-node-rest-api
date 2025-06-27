@@ -33,6 +33,8 @@ contactsRouter.put(
   updateContactById
 );
 
+contactsRouter.patch("/:id", authenticate, updateContactById);
+
 contactsRouter.patch(
   "/:id/favorite",
   validateBody(updateFavoriteSchema),
