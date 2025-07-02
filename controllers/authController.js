@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
+import path from "path";
+import fs from "fs/promises";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -15,7 +17,6 @@ export const register = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const avatarURL = gravatar.url(email, { s: "250", d: "robohash" }, true);
 
     const newUser = await User.create({
@@ -69,11 +70,8 @@ export const login = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    const user = req.user;
-
-    user.token = null;
-    await user.save();
-
+    req.user.token = null;
+    await req.user.save();
     res.status(204).send();
   } catch (error) {
     next(error);
@@ -84,6 +82,26 @@ export const getCurrent = async (req, res, next) => {
   try {
     const { email, subscription } = req.user;
     res.status(200).json({ email, subscription });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateAvatar = async (req, res, next) => {
+  try {
+    const { path: tempUpload, originalname } = req.file;
+    const { id } = req.user;
+
+    const filename = `avatar-${id}${path.extname(originalname)}`;
+    const resultUpload = path.resolve("public", "avatars", filename);
+
+    await fs.rename(tempUpload, resultUpload);
+
+    const avatarURL = `/avatars/${filename}`;
+    req.user.avatarURL = avatarURL;
+    await req.user.save();
+
+    res.status(200).json({ avatarURL });
   } catch (error) {
     next(error);
   }
