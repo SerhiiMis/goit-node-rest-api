@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -15,15 +16,19 @@ export const register = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const avatarURL = gravatar.url(email, { s: "250", d: "robohash" }, true);
+
     const newUser = await User.create({
       email,
       password: hashedPassword,
+      avatarURL,
     });
 
     res.status(201).json({
       user: {
         email: newUser.email,
         subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
       },
     });
   } catch (error) {
