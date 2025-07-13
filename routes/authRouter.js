@@ -10,9 +10,13 @@ import validateBody from "../helpers/validateBody.js";
 import { registerSchema, loginSchema } from "../schemas/authSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
 import { upload } from "../middlewares/upload.js";
+import { verifyEmail } from "../controllers/authController.js";
+import { resendVerifyEmail } from "../controllers/authController.js";
 
 const authRouter = express.Router();
 
+authRouter.post("/verify", resendVerifyEmail);
+authRouter.get("/verify/:verificationToken", verifyEmail);
 authRouter.post("/register", validateBody(registerSchema), register);
 authRouter.post("/login", validateBody(loginSchema), login);
 authRouter.post("/logout", authenticate, logout);
