@@ -5,6 +5,7 @@ import gravatar from "gravatar";
 import path from "path";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
+import { sendEmail } from "../helpers/sendEmail.js";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -21,6 +22,13 @@ export const register = async (req, res, next) => {
     const avatarURL = gravatar.url(email, { s: "250", d: "robohash" }, true);
     const verificationToken = nanoid();
 
+    const verifyLink = `http://localhost:3000/api/auth/verify/${verificationToken}`;
+    await sendEmail(
+      email,
+      "Verify your email",
+      `<p>Click the link to verify your email: <a href="${verifyLink}">${verifyLink}</a></p>`
+    );
+
     const newUser = await User.create({
       email,
       password: hashedPassword,
@@ -33,7 +41,6 @@ export const register = async (req, res, next) => {
         email: newUser.email,
         subscription: newUser.subscription,
         avatarURL: newUser.avatarURL,
-        verificationToken: newUser.verificationToken,
       },
     });
   } catch (error) {
@@ -46,8 +53,13 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
+
     if (!user) {
       return res.status(401).json({ message: "Email or password is wrong" });
+    }
+
+    if (!user.verify) {
+      return res.status(401).json({ message: "Email not verified" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -151,9 +163,19 @@ export const resendVerifyEmail = async (req, res, next) => {
         .json({ message: "Verification has already been passed" });
     }
 
-    // тут ми б відправляли лист, але наразі просто лог в консоль:
-    const verifyLink = `http://localhost:3000/api/auth/verify/${user.verificationToken}`;
-    console.log(`Send verification email to ${email}: ${verifyLink}`);
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await sendEmail(
+      user.email,
+      "Resend verification email",
+      `<p>Click the link to verify your email: <a href="http://localhost:3000/api/auth/verify/${user.verificationToken}">Verify Email</a></p>`
+    );
 
     res.status(200).json({ message: "Verification email sent" });
   } catch (error) {
