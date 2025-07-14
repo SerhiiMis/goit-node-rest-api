@@ -52,13 +52,14 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!user.verify) {
-      return res.status(401).json({ message: "Email not verified" });
-    }
-
     const user = await User.findOne({ where: { email } });
+
     if (!user) {
       return res.status(401).json({ message: "Email or password is wrong" });
+    }
+
+    if (!user.verify) {
+      return res.status(401).json({ message: "Email not verified" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -162,7 +163,14 @@ export const resendVerifyEmail = async (req, res, next) => {
         .json({ message: "Verification has already been passed" });
     }
 
-    const verifyLink = `http://localhost:3000/api/auth/verify/${user.verificationToken}`;
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
     await sendEmail(
       user.email,
       "Resend verification email",
